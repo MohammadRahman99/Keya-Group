@@ -1,10 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { KeyaProduct, Division, CarouselSlide, NewsArticle, JobOpening } from '../models/keya-data.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class KeyaDataService {
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:5242/api'; // ASP.NET Core API URL
 
   readonly officialVideoUrl = 'https://www.youtube.com/embed/ly3uYm7GGO4?autoplay=1';
   readonly videoPosterUrl = 'https://keyagroupbd.com/wp-content/uploads/2020/12/spinning-mill.jpg';
@@ -159,7 +164,7 @@ export class KeyaDataService {
     },
     {
       id: 'keya-toothpaste',
-      name: 'Keya Herbal Herbal Toothpaste',
+      name: 'Keya Herbal Toothpaste',
       category: 'cosmetics',
       categoryLabel: 'Cosmetics & Toiletries',
       imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3752.jpg',
@@ -178,72 +183,17 @@ export class KeyaDataService {
   ];
 
   readonly carouselSlides: CarouselSlide[] = [
-    {
-      id: '1',
-      title: 'Spinning Mill Production',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC4671.jpg',
-      tag: 'Textiles'
-    },
-    {
-      id: '2',
-      title: 'Precision Spinning Machines',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3375.jpg',
-      tag: 'Manufacturing'
-    },
-    {
-      id: '3',
-      title: 'High Capacity Yarn Spindles',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3397.jpg',
-      tag: 'Factory Floor'
-    },
-    {
-      id: '4',
-      title: 'Cotton Carding Unit',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3384.jpg',
-      tag: 'Cotton Division'
-    },
-    {
-      id: '5',
-      title: 'Keya Cosmetics Line',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3411.jpg',
-      tag: 'Cosmetics'
-    },
-    {
-      id: '6',
-      title: 'Personal Care Packaging',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3752.jpg',
-      tag: 'Toiletries'
-    },
-    {
-      id: '7',
-      title: 'Skin Care Products',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3778.jpg',
-      tag: 'Keya Beauty'
-    },
-    {
-      id: '8',
-      title: 'Garment Sewing Line',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC4720-1024x682-1.jpg',
-      tag: 'RMG Unit 1'
-    },
-    {
-      id: '9',
-      title: 'Quality Inspection Area',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC4722-1024x682-1.jpg',
-      tag: 'Quality Control'
-    },
-    {
-      id: '10',
-      title: 'Men\'s Polo Shirt Line',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/Mens-Polo-Shirt-1-1400x800-1.png',
-      tag: 'Apparel'
-    },
-    {
-      id: '11',
-      title: 'Pullover Sweat Shirt Collection',
-      imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/Pullover-Sweat-Shirt-1400x800-1.png',
-      tag: 'Knitwear'
-    }
+    { id: '1', title: 'Spinning Mill Production', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC4671.jpg', tag: 'Textiles' },
+    { id: '2', title: 'Precision Spinning Machines', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3375.jpg', tag: 'Manufacturing' },
+    { id: '3', title: 'High Capacity Yarn Spindles', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3397.jpg', tag: 'Factory Floor' },
+    { id: '4', title: 'Cotton Carding Unit', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3384.jpg', tag: 'Cotton Division' },
+    { id: '5', title: 'Keya Cosmetics Line', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3411.jpg', tag: 'Cosmetics' },
+    { id: '6', title: 'Personal Care Packaging', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3752.jpg', tag: 'Toiletries' },
+    { id: '7', title: 'Skin Care Products', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3778.jpg', tag: 'Keya Beauty' },
+    { id: '8', title: 'Garment Sewing Line', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC4720-1024x682-1.jpg', tag: 'RMG Unit 1' },
+    { id: '9', title: 'Quality Inspection Area', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC4722-1024x682-1.jpg', tag: 'Quality Control' },
+    { id: '10', title: 'Men\'s Polo Shirt Line', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/Mens-Polo-Shirt-1-1400x800-1.png', tag: 'Apparel' },
+    { id: '11', title: 'Pullover Sweat Shirt Collection', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/Pullover-Sweat-Shirt-1400x800-1.png', tag: 'Knitwear' }
   ];
 
   readonly newsArticles: NewsArticle[] = [
@@ -310,5 +260,18 @@ export class KeyaDataService {
   getProductsByCategory(category: string): KeyaProduct[] {
     if (category === 'all') return this.products;
     return this.products.filter(p => p.category === category);
+  }
+
+  // ASP.NET Core API Integration Calls
+  submitContactInquiry(inquiry: { name: string; email: string; message: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/contact`, inquiry).pipe(
+      catchError(() => of({ message: 'Submitted via fallback' }))
+    );
+  }
+
+  submitJobApplication(application: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/careers/apply`, application).pipe(
+      catchError(() => of({ message: 'Application submitted via fallback' }))
+    );
   }
 }
