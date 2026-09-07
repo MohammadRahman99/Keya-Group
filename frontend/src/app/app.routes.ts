@@ -7,6 +7,9 @@ import { NewsEventsPageComponent } from './pages/news-events-page/news-events-pa
 import { CsrPageComponent } from './pages/csr-page/csr-page.component';
 import { CareerPageComponent } from './pages/career-page/career-page.component';
 import { ContactPageComponent } from './pages/contact-page/contact-page.component';
+import { SignInPageComponent } from './pages/sign-in-page/sign-in-page.component';
+import { AdminDashboardComponent } from './pages/admin/admin-dashboard.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
@@ -19,5 +22,7 @@ export const routes: Routes = [
   { path: 'csr', component: CsrPageComponent },
   { path: 'career', component: CareerPageComponent },
   { path: 'contact', component: ContactPageComponent },
+  { path: 'sign-in', component: SignInPageComponent },
+  { path: 'admin', component: AdminDashboardComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

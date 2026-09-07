@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KeyaGroup.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6cd5ce62d94929e26da2f363bba5cd8805e72e4b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+69d0632c689229a225b7a6edf8ceffc3a01facb0")]
 [assembly: System.Reflection.AssemblyProductAttribute("KeyaGroup.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KeyaGroup.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

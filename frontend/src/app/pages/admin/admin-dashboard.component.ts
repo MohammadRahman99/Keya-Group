@@ -39,7 +39,7 @@ import { Employee } from '../../models/user.model';
                 'fa-solid fa-boxes-packing mr-1': authService.currentRole === 'ProductManager',
                 'fa-solid fa-headset mr-1': authService.currentRole === 'Operator'
               }"></i>
-              {{ authService.currentRole }} Role
+              {{ authService.currentRole === 'ProductManager' ? 'Product Manager' : authService.currentRole }} Role
             </span>
 
             <button 
@@ -56,10 +56,12 @@ import { Employee } from '../../models/user.model';
       <!-- Main Dashboard Container -->
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
         
-        <!-- Navigation Tabs Bar -->
+        <!-- Role-Based Navigation Tabs Bar -->
         <div class="bg-white rounded-2xl p-2 shadow-sm border border-gray-100 mb-8 flex flex-wrap gap-2">
           
+          <!-- 1. Product Purchase Queries Tab (Visible to Admin & Operator) -->
           <button 
+            *ngIf="authService.currentRole === 'Admin' || authService.currentRole === 'Operator'"
             (click)="activeTab = 'productQueries'" 
             [class]="activeTab === 'productQueries' ? 'bg-[#0170B9] text-white font-bold shadow' : 'text-gray-600 hover:bg-gray-100 font-medium'"
             class="px-5 py-2.5 rounded-xl text-xs transition-all flex items-center gap-2 relative"
@@ -70,14 +72,16 @@ import { Employee } from '../../models/user.model';
             </span>
           </button>
 
+          <!-- 2. Products CRUD Tab (Visible to Admin, Product Manager & Operator) -->
           <button 
             (click)="activeTab = 'products'" 
             [class]="activeTab === 'products' ? 'bg-[#0170B9] text-white font-bold shadow' : 'text-gray-600 hover:bg-gray-100 font-medium'"
             class="px-5 py-2.5 rounded-xl text-xs transition-all flex items-center gap-2"
           >
-            <i class="fa-solid fa-box-open"></i> Products CRUD
+            <i class="fa-solid fa-box-open"></i> Products Management
           </button>
 
+          <!-- 3. Categories CRUD Tab (Visible to Admin, Product Manager & Operator) -->
           <button 
             (click)="activeTab = 'categories'" 
             [class]="activeTab === 'categories' ? 'bg-[#0170B9] text-white font-bold shadow' : 'text-gray-600 hover:bg-gray-100 font-medium'"
@@ -86,26 +90,30 @@ import { Employee } from '../../models/user.model';
             <i class="fa-solid fa-layer-group"></i> Categories & Subcategories
           </button>
 
+          <!-- 4. Employee Directory CRUD Tab (STRICTLY EXCLUSIVE TO ADMIN ONLY) -->
           <button 
+            *ngIf="authService.currentRole === 'Admin'"
             (click)="activeTab = 'employees'" 
-            [class]="activeTab === 'employees' ? 'bg-[#0170B9] text-white font-bold shadow' : 'text-gray-600 hover:bg-gray-100 font-medium'"
+            [class]="activeTab === 'employees' ? 'bg-purple-700 text-white font-bold shadow' : 'text-gray-600 hover:bg-gray-100 font-medium'"
             class="px-5 py-2.5 rounded-xl text-xs transition-all flex items-center gap-2"
           >
-            <i class="fa-solid fa-users-gear"></i> Employee Directory
+            <i class="fa-solid fa-user-shield"></i> Employee Directory (Admin Only)
           </button>
 
+          <!-- 5. General Contact Inquiries Tab (Visible to Admin & Operator) -->
           <button 
+            *ngIf="authService.currentRole === 'Admin' || authService.currentRole === 'Operator'"
             (click)="activeTab = 'inquiries'" 
             [class]="activeTab === 'inquiries' ? 'bg-[#0170B9] text-white font-bold shadow' : 'text-gray-600 hover:bg-gray-100 font-medium'"
             class="px-5 py-2.5 rounded-xl text-xs transition-all flex items-center gap-2"
           >
-            <i class="fa-solid fa-envelope-open-text"></i> General Contact Inquiries
+            <i class="fa-solid fa-envelope-open-text"></i> Contact Inquiries
           </button>
 
         </div>
 
-        <!-- 1. PRODUCT PURCHASE QUERIES TAB (MAIN USER REQUIREMENT) -->
-        <div *ngIf="activeTab === 'productQueries'" class="space-y-6">
+        <!-- 1. PRODUCT PURCHASE QUERIES TAB -->
+        <div *ngIf="activeTab === 'productQueries' && (authService.currentRole === 'Admin' || authService.currentRole === 'Operator')" class="space-y-6">
           <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
               <div>
@@ -299,17 +307,20 @@ import { Employee } from '../../models/user.model';
           </div>
         </div>
 
-        <!-- 4. EMPLOYEE / STAFF DIRECTORY TAB -->
-        <div *ngIf="activeTab === 'employees'" class="space-y-6">
-          <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <!-- 4. EMPLOYEE / STAFF DIRECTORY TAB (ADMIN ONLY) -->
+        <div *ngIf="activeTab === 'employees' && authService.currentRole === 'Admin'" class="space-y-6">
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-purple-100">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
               <div>
-                <h2 class="text-lg font-bold text-gray-900">Employee & Staff Directory (CRUD)</h2>
-                <p class="text-xs text-gray-500">Manage internal staff accounts, role permissions, and active status.</p>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-lg font-bold text-gray-900">Employee Directory Management</h2>
+                  <span class="bg-purple-100 text-purple-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">Admin Exclusive</span>
+                </div>
+                <p class="text-xs text-gray-500">Manage internal staff accounts, system permissions, and account activation.</p>
               </div>
               <button 
                 (click)="openAddEmployeeModal()" 
-                class="bg-[#0170B9] hover:bg-[#005894] text-white px-5 py-2.5 rounded-lg text-xs font-bold transition-all shadow flex items-center gap-2 w-max"
+                class="bg-purple-700 hover:bg-purple-800 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition-all shadow flex items-center gap-2 w-max"
               >
                 <i class="fa-solid fa-user-plus"></i> Add New Employee
               </button>
@@ -318,7 +329,7 @@ import { Employee } from '../../models/user.model';
             <!-- Employees Table -->
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs text-gray-700">
-                <thead class="bg-gray-50 text-gray-500 uppercase tracking-wider font-bold">
+                <thead class="bg-purple-50/50 text-gray-500 uppercase tracking-wider font-bold">
                   <tr>
                     <th class="px-4 py-3">Staff Name</th>
                     <th class="px-4 py-3">Email Address</th>
@@ -330,7 +341,7 @@ import { Employee } from '../../models/user.model';
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 font-medium">
-                  <tr *ngFor="let emp of employeesList" class="hover:bg-gray-50/60">
+                  <tr *ngFor="let emp of employeesList" class="hover:bg-purple-50/20">
                     <td class="px-4 py-3 font-semibold text-gray-900">{{ emp.fullName }}</td>
                     <td class="px-4 py-3 text-[#0170B9]">{{ emp.email }}</td>
                     <td class="px-4 py-3">
@@ -365,7 +376,7 @@ import { Employee } from '../../models/user.model';
         </div>
 
         <!-- 5. GENERAL CONTACT INQUIRIES TAB -->
-        <div *ngIf="activeTab === 'inquiries'" class="space-y-6">
+        <div *ngIf="activeTab === 'inquiries' && (authService.currentRole === 'Admin' || authService.currentRole === 'Operator')" class="space-y-6">
           <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
               <div>
@@ -604,11 +615,21 @@ export class AdminDashboardComponent implements OnInit {
   activeEmployee: any = {};
 
   ngOnInit() {
+    this.configureDefaultRoleTab();
     this.loadProductQueries();
     this.loadProducts();
     this.loadCategories();
     this.loadEmployees();
     this.loadInquiries();
+  }
+
+  configureDefaultRoleTab() {
+    const role = this.authService.currentRole;
+    if (role === 'ProductManager') {
+      this.activeTab = 'products';
+    } else {
+      this.activeTab = 'productQueries';
+    }
   }
 
   loadProductQueries() {
@@ -634,7 +655,9 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   loadEmployees() {
-    this.dataService.getEmployeesFromApi().subscribe(employees => this.employeesList = employees);
+    if (this.authService.currentRole === 'Admin') {
+      this.dataService.getEmployeesFromApi().subscribe(employees => this.employeesList = employees);
+    }
   }
 
   loadInquiries() {
@@ -739,20 +762,23 @@ export class AdminDashboardComponent implements OnInit {
     this.dataService.deleteSubcategoryApi(subId).subscribe(() => this.loadCategories());
   }
 
-  // --- EMPLOYEE CRUD ---
+  // --- EMPLOYEE CRUD (ADMIN ONLY) ---
   openAddEmployeeModal() {
+    if (this.authService.currentRole !== 'Admin') return;
     this.isEditingEmployee = false;
     this.activeEmployee = { fullName: '', email: '', password: '', role: 'Operator', department: 'General Operations', phoneNumber: '', isActive: true };
     this.showEmployeeModal = true;
   }
 
   openEditEmployeeModal(emp: Employee) {
+    if (this.authService.currentRole !== 'Admin') return;
     this.isEditingEmployee = true;
     this.activeEmployee = { ...emp, password: '' };
     this.showEmployeeModal = true;
   }
 
   saveEmployee() {
+    if (this.authService.currentRole !== 'Admin') return;
     if (this.isEditingEmployee) {
       this.dataService.updateEmployeeApi(this.activeEmployee.id, this.activeEmployee).subscribe(() => {
         this.loadEmployees();
@@ -767,6 +793,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   deleteEmployee(id: number) {
+    if (this.authService.currentRole !== 'Admin') return;
     this.dataService.deleteEmployeeApi(id).subscribe(() => this.loadEmployees());
   }
 
