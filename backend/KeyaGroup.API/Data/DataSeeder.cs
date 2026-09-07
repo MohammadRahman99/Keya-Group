@@ -1,4 +1,5 @@
 using KeyaGroup.API.Entities;
+using KeyaGroup.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace KeyaGroup.API.Data
@@ -8,6 +9,93 @@ namespace KeyaGroup.API.Data
         public static async Task SeedAsync(KeyaGroupDbContext context)
         {
             await context.Database.EnsureCreatedAsync();
+
+            if (!await context.Categories.AnyAsync())
+            {
+                var cosmeticsCat = new Category
+                {
+                    Name = "Cosmetics & Toiletries",
+                    Slug = "cosmetics-toiletries",
+                    Description = "Personal care, skincare, oral hygiene, and household laundry products.",
+                    Subcategories = new List<Subcategory>
+                    {
+                        new Subcategory { Name = "Beauty Soap", Slug = "beauty-soap" },
+                        new Subcategory { Name = "Petroleum Jelly", Slug = "petroleum-jelly" },
+                        new Subcategory { Name = "Oral Care & Toothpaste", Slug = "oral-care" },
+                        new Subcategory { Name = "Laundry Detergent Powder", Slug = "laundry-detergent" }
+                    }
+                };
+
+                var rmgCat = new Category
+                {
+                    Name = "RMG & Textiles",
+                    Slug = "rmg-textiles",
+                    Description = "High-quality knitwear, cotton yarns, combed fibers, and exported apparel.",
+                    Subcategories = new List<Subcategory>
+                    {
+                        new Subcategory { Name = "Men's Polo Shirts", Slug = "mens-polo" },
+                        new Subcategory { Name = "Women's Knitwear", Slug = "womens-knitwear" },
+                        new Subcategory { Name = "Fleece Sweatshirts & Hoodies", Slug = "sweatshirts" },
+                        new Subcategory { Name = "Ring-Spun Cotton Yarns", Slug = "cotton-yarns" }
+                    }
+                };
+
+                var agroCat = new Category
+                {
+                    Name = "Agro & Organic Processing",
+                    Slug = "agro-processing",
+                    Description = "Botanical extracts, natural herbal processing, and essential organic oils.",
+                    Subcategories = new List<Subcategory>
+                    {
+                        new Subcategory { Name = "Natural Herbal Extracts", Slug = "herbal-extracts" },
+                        new Subcategory { Name = "Organic Essential Oils", Slug = "essential-oils" }
+                    }
+                };
+
+                await context.Categories.AddRangeAsync(new[] { cosmeticsCat, rmgCat, agroCat });
+            }
+
+            if (!await context.Users.AnyAsync())
+            {
+                var demoUsers = new List<User>
+                {
+                    new User
+                    {
+                        FullName = "System Administrator",
+                        Email = "admin@keyagroup.com",
+                        PasswordHash = PasswordHasher.HashPassword("Admin123!"),
+                        Role = "Admin",
+                        Department = "Executive Management",
+                        PhoneNumber = "+8801711001122",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new User
+                    {
+                        FullName = "Product Manager",
+                        Email = "pm@keyagroup.com",
+                        PasswordHash = PasswordHasher.HashPassword("Pm123!"),
+                        Role = "ProductManager",
+                        Department = "Product Merchandising & Catalogue",
+                        PhoneNumber = "+8801722334455",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new User
+                    {
+                        FullName = "Operations Staff",
+                        Email = "operator@keyagroup.com",
+                        PasswordHash = PasswordHasher.HashPassword("Operator123!"),
+                        Role = "Operator",
+                        Department = "Customer Inquiries & Operations",
+                        PhoneNumber = "+8801833445566",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    }
+                };
+
+                await context.Users.AddRangeAsync(demoUsers);
+            }
 
             if (!await context.Divisions.AnyAsync())
             {
@@ -227,6 +315,64 @@ namespace KeyaGroup.API.Data
                 };
 
                 await context.JobOpenings.AddRangeAsync(jobs);
+            }
+
+            if (!await context.ContactInquiries.AnyAsync())
+            {
+                var inquiries = new List<ContactInquiry>
+                {
+                    new ContactInquiry
+                    {
+                        Name = "Tariq Hasan",
+                        Email = "tariq@trade.com",
+                        Message = "Inquiring about bulk export order for Keya Super Lemon Soap to UK.",
+                        SubmittedAt = DateTime.UtcNow.AddDays(-2),
+                        Status = "Pending"
+                    },
+                    new ContactInquiry
+                    {
+                        Name = "Elena Rostova",
+                        Email = "elena@europe-textiles.eu",
+                        Message = "Requesting sample swatches for Men's Classic Polo Shirts.",
+                        SubmittedAt = DateTime.UtcNow.AddDays(-1),
+                        Status = "Pending"
+                    }
+                };
+
+                await context.ContactInquiries.AddRangeAsync(inquiries);
+            }
+
+            if (!await context.ProductInquiries.AnyAsync())
+            {
+                var productQueries = new List<ProductInquiry>
+                {
+                    new ProductInquiry
+                    {
+                        ProductId = "1",
+                        ProductName = "Keya Super Lemon Soap",
+                        CustomerName = "Tanvir Ahmed",
+                        CustomerEmail = "tanvir@supermarket-chain.bd",
+                        CustomerPhone = "+8801712998877",
+                        Quantity = "5,000 Cartons (150g)",
+                        Notes = "Looking for wholesale supply quote for superstore distribution in Dhaka & Chittagong.",
+                        SubmittedAt = DateTime.UtcNow.AddDays(-1),
+                        Status = "Pending"
+                    },
+                    new ProductInquiry
+                    {
+                        ProductId = "3",
+                        ProductName = "Men's Classic Polo Shirt",
+                        CustomerName = "Marcus Vance",
+                        CustomerEmail = "marcus@euro-apparel.co.uk",
+                        CustomerPhone = "+447911123456",
+                        Quantity = "2,500 Pieces (Assorted Sizes S-XXL)",
+                        Notes = "Export price quotation required with OEM custom logo tag stitching.",
+                        SubmittedAt = DateTime.UtcNow.AddHours(-12),
+                        Status = "Pending"
+                    }
+                };
+
+                await context.ProductInquiries.AddRangeAsync(productQueries);
             }
 
             await context.SaveChangesAsync();

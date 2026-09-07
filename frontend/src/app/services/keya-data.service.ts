@@ -1,15 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { KeyaProduct, Division, CarouselSlide, NewsArticle, JobOpening } from '../models/keya-data.model';
+import { catchError, map } from 'rxjs/operators';
+import { KeyaProduct, Division, CarouselSlide, NewsArticle, JobOpening, Category, ProductInquiry } from '../models/keya-data.model';
+import { Employee } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class KeyaDataService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:5242/api'; // ASP.NET Core API URL
+  private apiUrl = 'http://localhost:5242/api';
 
   readonly officialVideoUrl = 'https://www.youtube.com/embed/ly3uYm7GGO4?autoplay=1';
   readonly videoPosterUrl = 'https://keyagroupbd.com/wp-content/uploads/2020/12/spinning-mill.jpg';
@@ -190,10 +191,7 @@ export class KeyaDataService {
     { id: '5', title: 'Keya Cosmetics Line', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3411.jpg', tag: 'Cosmetics' },
     { id: '6', title: 'Personal Care Packaging', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3752.jpg', tag: 'Toiletries' },
     { id: '7', title: 'Skin Care Products', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3778.jpg', tag: 'Keya Beauty' },
-    { id: '8', title: 'Garment Sewing Line', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC4720-1024x682-1.jpg', tag: 'RMG Unit 1' },
-    { id: '9', title: 'Quality Inspection Area', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC4722-1024x682-1.jpg', tag: 'Quality Control' },
-    { id: '10', title: 'Men\'s Polo Shirt Line', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/Mens-Polo-Shirt-1-1400x800-1.png', tag: 'Apparel' },
-    { id: '11', title: 'Pullover Sweat Shirt Collection', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/Pullover-Sweat-Shirt-1400x800-1.png', tag: 'Knitwear' }
+    { id: '8', title: 'Garment Sewing Line', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC4720-1024x682-1.jpg', tag: 'RMG Unit 1' }
   ];
 
   readonly newsArticles: NewsArticle[] = [
@@ -253,6 +251,33 @@ export class KeyaDataService {
     }
   ];
 
+  readonly defaultCategories: Category[] = [
+    {
+      id: 1,
+      name: 'Cosmetics & Toiletries',
+      slug: 'cosmetics-toiletries',
+      description: 'Personal care, skincare, oral hygiene, and household laundry products.',
+      subcategories: [
+        { id: 101, name: 'Beauty Soap', slug: 'beauty-soap' },
+        { id: 102, name: 'Petroleum Jelly', slug: 'petroleum-jelly' },
+        { id: 103, name: 'Oral Care & Toothpaste', slug: 'oral-care' },
+        { id: 104, name: 'Laundry Detergent Powder', slug: 'laundry-detergent' }
+      ]
+    },
+    {
+      id: 2,
+      name: 'RMG & Textiles',
+      slug: 'rmg-textiles',
+      description: 'High-quality knitwear, cotton yarns, combed fibers, and exported apparel.',
+      subcategories: [
+        { id: 201, name: "Men's Polo Shirts", slug: 'mens-polo' },
+        { id: 202, name: "Women's Knitwear", slug: 'womens-knitwear' },
+        { id: 203, name: 'Fleece Sweatshirts & Hoodies', slug: 'sweatshirts' },
+        { id: 204, name: 'Ring-Spun Cotton Yarns', slug: 'cotton-yarns' }
+      ]
+    }
+  ];
+
   getDivisionBySlug(slug: string): Division | undefined {
     return this.divisions.find(d => d.slug === slug);
   }
@@ -262,7 +287,151 @@ export class KeyaDataService {
     return this.products.filter(p => p.category === category);
   }
 
-  // ASP.NET Core API Integration Calls
+  // Products API
+  getProductsFromApi(category?: string, search?: string): Observable<KeyaProduct[]> {
+    let params = '';
+    if (category) params += `category=${encodeURIComponent(category)}&`;
+    if (search) params += `search=${encodeURIComponent(search)}`;
+
+    return this.http.get<any[]>(`${this.apiUrl}/products?${params}`).pipe(
+      map(items => items.map(i => ({
+        id: i.id.toString(),
+        name: i.name,
+        category: i.category,
+        categoryLabel: i.categoryLabel,
+        imageUrl: i.imageUrl,
+        description: i.description,
+        weightOrSize: i.weightOrSize,
+        badge: i.badge
+      }))),
+      catchError(() => of(this.getProductsByCategory(category || 'all')))
+    );
+  }
+
+  createProductApi(product: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/products`, product).pipe(
+      catchError(() => of({ id: Date.now(), ...product }))
+    );
+  }
+
+  updateProductApi(id: number | string, product: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/products/${id}`, product).pipe(
+      catchError(() => of(product))
+    );
+  }
+
+  deleteProductApi(id: number | string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/products/${id}`).pipe(
+      catchError(() => of(true))
+    );
+  }
+
+  // Product Purchase Queries API
+  submitProductInquiry(inquiry: { productId: string; productName: string; customerName: string; customerEmail: string; customerPhone: string; quantity: string; notes?: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/productinquiries`, inquiry).pipe(
+      catchError(() => of({ message: 'Purchase inquiry submitted offline' }))
+    );
+  }
+
+  getProductInquiriesFromApi(): Observable<ProductInquiry[]> {
+    return this.http.get<ProductInquiry[]>(`${this.apiUrl}/productinquiries`).pipe(
+      catchError(() => of([
+        { id: 1, productId: '1', productName: 'Keya Super Lemon Soap', customerName: 'Tanvir Ahmed', customerEmail: 'tanvir@supermarket-chain.bd', customerPhone: '+8801712998877', quantity: '5,000 Cartons (150g)', notes: 'Wholesale supply quote required.', status: 'Pending' },
+        { id: 2, productId: '3', productName: 'Men\'s Classic Polo Shirt', customerName: 'Marcus Vance', customerEmail: 'marcus@euro-apparel.co.uk', customerPhone: '+447911123456', quantity: '2,500 Pieces', notes: 'Export price quotation required with custom tags.', status: 'Pending' }
+      ]))
+    );
+  }
+
+  updateProductInquiryStatusApi(id: number, status: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/productinquiries/${id}/status`, { status }).pipe(
+      catchError(() => of({ message: 'Status updated offline' }))
+    );
+  }
+
+  // Categories & Subcategories API
+  getCategoriesFromApi(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.apiUrl}/categories`).pipe(
+      catchError(() => of(this.defaultCategories))
+    );
+  }
+
+  createCategoryApi(category: { name: string; slug: string; description: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/categories`, category).pipe(
+      catchError(() => of({ id: Date.now(), ...category, subcategories: [] }))
+    );
+  }
+
+  updateCategoryApi(id: number, category: { name: string; slug: string; description: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/categories/${id}`, category).pipe(
+      catchError(() => of(category))
+    );
+  }
+
+  deleteCategoryApi(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/categories/${id}`).pipe(
+      catchError(() => of(true))
+    );
+  }
+
+  addSubcategoryApi(categoryId: number, subcategory: { name: string; slug: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/categories/${categoryId}/subcategories`, subcategory).pipe(
+      catchError(() => of({ id: Date.now(), categoryId, ...subcategory }))
+    );
+  }
+
+  deleteSubcategoryApi(subId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/categories/subcategories/${subId}`).pipe(
+      catchError(() => of(true))
+    );
+  }
+
+  // Employees API
+  getEmployeesFromApi(): Observable<Employee[]> {
+    const fallbackEmployees: Employee[] = [
+      { id: 1, fullName: 'System Administrator', email: 'admin@keyagroup.com', role: 'Admin', department: 'Executive Management', phoneNumber: '+8801711001122', isActive: true },
+      { id: 2, fullName: 'Product Manager', email: 'pm@keyagroup.com', role: 'ProductManager', department: 'Product Merchandising', phoneNumber: '+8801722334455', isActive: true },
+      { id: 3, fullName: 'Operations Staff', email: 'operator@keyagroup.com', role: 'Operator', department: 'Operations & Inquiries', phoneNumber: '+8801833445566', isActive: true }
+    ];
+
+    return this.http.get<Employee[]>(`${this.apiUrl}/employees`).pipe(
+      catchError(() => of(fallbackEmployees))
+    );
+  }
+
+  createEmployeeApi(employee: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/employees`, employee).pipe(
+      catchError(() => of({ id: Date.now(), ...employee }))
+    );
+  }
+
+  updateEmployeeApi(id: number, employee: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/employees/${id}`, employee).pipe(
+      catchError(() => of(employee))
+    );
+  }
+
+  deleteEmployeeApi(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/employees/${id}`).pipe(
+      catchError(() => of(true))
+    );
+  }
+
+  // Contact Inquiries API
+  getInquiriesFromApi(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/contact`).pipe(
+      catchError(() => of([
+        { id: 1, name: 'Tariq Hasan', email: 'tariq@trade.com', message: 'Inquiring about bulk export order for Keya Super Lemon Soap to UK.', status: 'Pending' },
+        { id: 2, name: 'Elena Rostova', email: 'elena@europe-textiles.eu', message: 'Requesting sample swatches for Men\'s Classic Polo Shirts.', status: 'Pending' }
+      ]))
+    );
+  }
+
+  resolveInquiryApi(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/contact/${id}/resolve`, {}).pipe(
+      catchError(() => of({ message: 'Resolved offline' }))
+    );
+  }
+
   submitContactInquiry(inquiry: { name: string; email: string; message: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/contact`, inquiry).pipe(
       catchError(() => of({ message: 'Submitted via fallback' }))

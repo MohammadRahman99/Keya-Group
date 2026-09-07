@@ -29,21 +29,21 @@ import { KeyaProduct } from '../../models/keya-data.model';
           <div class="flex flex-wrap gap-2 w-full md:w-auto">
             <button 
               (click)="setCategory('all')" 
-              [class]="selectedCategory === 'all' ? 'bg-[#0170B9] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              [class]="selectedCategory === 'all' ? 'bg-[#0170B9] text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
               class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
             >
               All Products
             </button>
             <button 
               (click)="setCategory('cosmetics')" 
-              [class]="selectedCategory === 'cosmetics' ? 'bg-[#0170B9] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              [class]="selectedCategory === 'cosmetics' ? 'bg-[#0170B9] text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
               class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
             >
               Cosmetics & Toiletries
             </button>
             <button 
               (click)="setCategory('textiles')" 
-              [class]="selectedCategory === 'textiles' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              [class]="selectedCategory === 'textiles' ? 'bg-emerald-600 text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
               class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
             >
               RMG & Textiles
@@ -56,6 +56,7 @@ import { KeyaProduct } from '../../models/keya-data.model';
             <input 
               type="text" 
               [(ngModel)]="searchQuery" 
+              (input)="applySearchFilter()"
               placeholder="Search products..." 
               class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0170B9]"
             />
@@ -63,8 +64,14 @@ import { KeyaProduct } from '../../models/keya-data.model';
 
         </div>
 
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="text-center py-16">
+          <i class="fa-solid fa-circle-notch animate-spin text-3xl text-[#0170B9] mb-3"></i>
+          <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Loading products catalogue...</p>
+        </div>
+
         <!-- Products Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           <div 
             *ngFor="let item of filteredProducts" 
             class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col justify-between group"
@@ -74,7 +81,7 @@ import { KeyaProduct } from '../../models/keya-data.model';
                 <img 
                   [src]="item.imageUrl" 
                   [alt]="item.name" 
-                  class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <span 
                   *ngIf="item.badge" 
@@ -100,10 +107,18 @@ import { KeyaProduct } from '../../models/keya-data.model';
               </div>
             </div>
 
-            <div class="p-5 pt-0">
+            <div class="p-5 pt-0 space-y-2">
+              <!-- Inquire Purchase Button -->
+              <button 
+                (click)="openPurchaseQueryModal(item)"
+                class="w-full bg-[#0170B9] hover:bg-[#005894] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow"
+              >
+                <i class="fa-solid fa-cart-flatbed"></i> Inquire Purchase / Get Quote
+              </button>
+
               <button 
                 (click)="openModal(item)"
-                class="w-full bg-gray-100 hover:bg-[#0170B9] hover:text-white text-gray-800 text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5"
               >
                 <i class="fa-solid fa-eye"></i> View Details
               </button>
@@ -111,7 +126,8 @@ import { KeyaProduct } from '../../models/keya-data.model';
           </div>
         </div>
 
-        <div *ngIf="filteredProducts.length === 0" class="bg-white rounded-2xl p-12 text-center text-gray-500 border border-gray-100 my-8">
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && filteredProducts.length === 0" class="bg-white rounded-2xl p-12 text-center text-gray-500 border border-gray-100 my-8">
           <i class="fa-solid fa-box-open text-4xl text-gray-300 mb-3 block"></i>
           <p class="font-semibold text-gray-700">No products match your search filter.</p>
           <button (click)="resetFilters()" class="mt-4 text-xs font-bold text-[#0170B9] hover:underline uppercase tracking-wider">
@@ -119,6 +135,73 @@ import { KeyaProduct } from '../../models/keya-data.model';
           </button>
         </div>
 
+      </div>
+
+      <!-- Product Purchase Quote Request Modal -->
+      <div *ngIf="showPurchaseModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100">
+          <button 
+            (click)="showPurchaseModal = false" 
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-xl"
+            aria-label="Close"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+
+          <div class="flex items-center gap-3 mb-4 pb-3 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#0170B9] flex items-center justify-center text-lg font-bold">
+              <i class="fa-solid fa-file-signature"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900 leading-tight">Product Purchase Inquiry</h3>
+              <span class="text-xs text-gray-500">Target Product: <strong class="text-[#0170B9]">{{ targetProduct?.name }}</strong></span>
+            </div>
+          </div>
+
+          <!-- Success Alert -->
+          <div *ngIf="inquirySubmitted" class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-circle-check text-lg"></i>
+            <span>Thank you! Your purchase inquiry has been submitted. Keya Group sales staff will contact you shortly.</span>
+          </div>
+
+          <form *ngIf="!inquirySubmitted" (ngSubmit)="submitPurchaseQuery()" class="space-y-4 text-xs">
+            <div>
+              <label class="block font-bold uppercase text-gray-600 mb-1">Your Full Name</label>
+              <input type="text" [(ngModel)]="customerName" name="custName" required placeholder="e.g. Tanvir Hasan" class="w-full px-3.5 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#0170B9] outline-none" />
+            </div>
+
+            <div>
+              <label class="block font-bold uppercase text-gray-600 mb-1">Email Address</label>
+              <input type="email" [(ngModel)]="customerEmail" name="custEmail" required placeholder="e.g. tanvir&#64;company.com" class="w-full px-3.5 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#0170B9] outline-none" />
+            </div>
+
+            <div>
+              <label class="block font-bold uppercase text-gray-600 mb-1">Phone / Mobile Number (Required for Call)</label>
+              <input type="text" [(ngModel)]="customerPhone" name="custPhone" required placeholder="e.g. +8801700000000" class="w-full px-3.5 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#0170B9] outline-none" />
+            </div>
+
+            <div>
+              <label class="block font-bold uppercase text-gray-600 mb-1">Estimated Quantity Required</label>
+              <input type="text" [(ngModel)]="quantity" name="custQty" required placeholder="e.g. 1,000 Boxes / 500 Pcs" class="w-full px-3.5 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#0170B9] outline-none" />
+            </div>
+
+            <div>
+              <label class="block font-bold uppercase text-gray-600 mb-1">Additional Specifications / Notes</label>
+              <textarea [(ngModel)]="notes" name="custNotes" rows="3" placeholder="e.g. Wholesale price quote required for Chittagong distribution..." class="w-full px-3.5 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#0170B9] outline-none"></textarea>
+            </div>
+
+            <button 
+              type="submit" 
+              [disabled]="!customerName || !customerEmail || !customerPhone || !quantity || isSubmittingInquiry"
+              class="w-full bg-[#0170B9] hover:bg-[#005894] disabled:bg-gray-300 text-white font-bold py-3 rounded-lg text-xs uppercase tracking-wider shadow transition-all flex items-center justify-center gap-2"
+            >
+              <span *ngIf="!isSubmittingInquiry">Submit Purchase Query</span>
+              <span *ngIf="isSubmittingInquiry" class="flex items-center gap-2">
+                <i class="fa-solid fa-circle-notch animate-spin"></i> Submitting...
+              </span>
+            </button>
+          </form>
+        </div>
       </div>
 
       <!-- Product Modal Lightbox -->
@@ -142,13 +225,13 @@ import { KeyaProduct } from '../../models/keya-data.model';
           <h3 class="text-xl font-bold text-gray-900 mb-2">{{ activeModalProduct.name }}</h3>
           <p class="text-sm text-gray-600 leading-relaxed mb-4">{{ activeModalProduct.description }}</p>
 
-          <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+          <div class="pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
             <span *ngIf="activeModalProduct.weightOrSize" class="text-xs font-semibold text-gray-500">
               Spec: {{ activeModalProduct.weightOrSize }}
             </span>
-            <a routerLink="/contact" (click)="activeModalProduct = null" class="bg-[#0170B9] text-white text-xs font-bold px-5 py-2.5 rounded-lg hover:bg-[#005894] transition-all">
-              Inquire Wholesale
-            </a>
+            <button (click)="openPurchaseQueryModal(activeModalProduct); activeModalProduct = null" class="bg-[#0170B9] text-white text-xs font-bold px-5 py-2.5 rounded-lg hover:bg-[#005894] transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-cart-flatbed"></i> Inquire Purchase / Get Quote
+            </button>
           </div>
         </div>
       </div>
@@ -162,35 +245,109 @@ export class ProductsPageComponent implements OnInit {
 
   selectedCategory = 'all';
   searchQuery = '';
+  isLoading = true;
+  rawProducts: KeyaProduct[] = [];
+  filteredProducts: KeyaProduct[] = [];
   activeModalProduct: KeyaProduct | null = null;
+
+  // Purchase Query Modal State
+  showPurchaseModal = false;
+  targetProduct: KeyaProduct | null = null;
+  customerName = '';
+  customerEmail = '';
+  customerPhone = '';
+  quantity = '';
+  notes = '';
+  isSubmittingInquiry = false;
+  inquirySubmitted = false;
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       if (params['category']) {
         this.selectedCategory = params['category'];
       }
+      this.fetchLiveProducts();
     });
   }
 
-  get filteredProducts(): KeyaProduct[] {
-    let list = this.dataService.getProductsByCategory(this.selectedCategory);
-    if (this.searchQuery.trim()) {
-      const q = this.searchQuery.toLowerCase();
-      list = list.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
-    }
-    return list;
+  fetchLiveProducts() {
+    this.isLoading = true;
+    this.dataService.getProductsFromApi(this.selectedCategory).subscribe({
+      next: (products) => {
+        this.rawProducts = products;
+        this.applySearchFilter();
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
   setCategory(cat: string) {
     this.selectedCategory = cat;
+    this.fetchLiveProducts();
+  }
+
+  applySearchFilter() {
+    if (!this.searchQuery.trim()) {
+      this.filteredProducts = [...this.rawProducts];
+    } else {
+      const q = this.searchQuery.toLowerCase();
+      this.filteredProducts = this.rawProducts.filter(
+        p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
+      );
+    }
   }
 
   resetFilters() {
     this.selectedCategory = 'all';
     this.searchQuery = '';
+    this.fetchLiveProducts();
   }
 
   openModal(product: KeyaProduct) {
     this.activeModalProduct = product;
+  }
+
+  openPurchaseQueryModal(product: KeyaProduct) {
+    this.targetProduct = product;
+    this.customerName = '';
+    this.customerEmail = '';
+    this.customerPhone = '';
+    this.quantity = '';
+    this.notes = '';
+    this.inquirySubmitted = false;
+    this.showPurchaseModal = true;
+  }
+
+  submitPurchaseQuery() {
+    if (!this.targetProduct || !this.customerName || !this.customerEmail || !this.customerPhone || !this.quantity) return;
+
+    this.isSubmittingInquiry = true;
+
+    const payload = {
+      productId: this.targetProduct.id,
+      productName: this.targetProduct.name,
+      customerName: this.customerName,
+      customerEmail: this.customerEmail,
+      customerPhone: this.customerPhone,
+      quantity: this.quantity,
+      notes: this.notes
+    };
+
+    this.dataService.submitProductInquiry(payload).subscribe({
+      next: () => {
+        this.isSubmittingInquiry = false;
+        this.inquirySubmitted = true;
+        setTimeout(() => {
+          this.showPurchaseModal = false;
+        }, 3000);
+      },
+      error: () => {
+        this.isSubmittingInquiry = false;
+        this.inquirySubmitted = true;
+      }
+    });
   }
 }
