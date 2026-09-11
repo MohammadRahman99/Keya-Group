@@ -1,20 +1,30 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <footer class="bg-white border-t border-gray-300 py-8 transition-colors">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           
-          <!-- Copyright Info -->
-          <div class="text-sm text-gray-600 font-medium">
-            Copyright © {{ currentYear }} <span class="text-gray-900 font-semibold">Keya Group</span> | Developed By 
-            <a href="http://icthub.net/" target="_blank" rel="noopener noreferrer" class="text-[#0170B9] hover:underline font-medium">
-              ICT Hub
+          <!-- Copyright Info & Staff Sign-In Link -->
+          <div class="flex flex-col sm:flex-row items-center gap-3 text-sm text-gray-600 font-medium">
+            <div>
+              Copyright © {{ currentYear }} <span class="text-gray-900 font-semibold">Keya Group</span> | Developed By 
+              <a href="http://icthub.net/" target="_blank" rel="noopener noreferrer" class="text-[#0170B9] hover:underline font-medium">
+                ICT Hub
+              </a>
+            </div>
+
+            <!-- Staff Sign-In Link for Admin Access -->
+            <span class="hidden sm:inline text-gray-300">|</span>
+            
+            <a routerLink="/sign-in" class="text-xs font-bold text-gray-500 hover:text-[#0170B9] transition-colors flex items-center gap-1 bg-gray-100 hover:bg-blue-50 px-3 py-1 rounded-full border border-gray-200">
+              <i class="fa-solid fa-lock text-[10px]"></i> Staff Sign-In Portal
             </a>
           </div>
 

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KeyaGroup.API.Entities
 {
@@ -28,6 +29,12 @@ namespace KeyaGroup.API.Entities
         public string? WeightOrSize { get; set; }
 
         public string? Badge { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Price { get; set; } = 0;
+
+        [MaxLength(100)]
+        public string? PriceFormatted { get; set; } // e.g. "৳ 120 / Pack" or "৳ 1,500 / Carton"
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

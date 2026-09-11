@@ -116,7 +116,9 @@ export class KeyaDataService {
       imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/2-Keya-Super-Lemon-Soap-2.jpg',
       description: 'Refreshing citrus beauty soap enriched with natural lemon extracts and moisturizing oils for vibrant, glowing skin.',
       weightOrSize: '100g / 150g',
-      badge: 'Best Seller'
+      badge: 'Best Seller',
+      price: 120,
+      priceFormatted: '৳ 120 / Pack (4 Bars)'
     },
     {
       id: 'rmg-apparel',
@@ -125,7 +127,9 @@ export class KeyaDataService {
       categoryLabel: 'RMG & Textiles',
       imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/rmg.jpg',
       description: 'High-quality 100% combed cotton polo shirts, hoodies, pullovers, and casual wear manufactured for top global retail brands.',
-      badge: 'Global Export'
+      badge: 'Global Export',
+      price: 650,
+      priceFormatted: '৳ 650 / Piece'
     },
     {
       id: 'mens-polo-shirt',
@@ -134,7 +138,9 @@ export class KeyaDataService {
       categoryLabel: 'RMG & Textiles',
       imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/Mens-Polo-Shirt-1-1400x800-1.png',
       description: 'Ergonomically tailored pique knit polo shirt featuring anti-pilling ring-spun cotton fabric with double-stitched hemline.',
-      weightOrSize: 'Sizes S - 3XL'
+      weightOrSize: 'Sizes S - 3XL',
+      price: 450,
+      priceFormatted: '৳ 450 / Piece'
     },
     {
       id: 'pullover-sweat-shirt',
@@ -143,7 +149,9 @@ export class KeyaDataService {
       categoryLabel: 'RMG & Textiles',
       imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/Pullover-Sweat-Shirt-1400x800-1.png',
       description: 'Ultra-warm heavy fleece sweatshirt with ribbed cuffs and neckband designed for international winter apparel lines.',
-      weightOrSize: 'Sizes S - XXL'
+      weightOrSize: 'Sizes S - XXL',
+      price: 850,
+      priceFormatted: '৳ 850 / Piece'
     },
     {
       id: 'womens-polo-shirt',
@@ -152,7 +160,9 @@ export class KeyaDataService {
       categoryLabel: 'RMG & Textiles',
       imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/Womens-Polo-Shirt-1400x800-1.png',
       description: 'Elegantly shaped 100% soft-touch cotton polo shirt engineered for maximum comfort and style durability.',
-      weightOrSize: 'Sizes XS - XL'
+      weightOrSize: 'Sizes XS - XL',
+      price: 420,
+      priceFormatted: '৳ 420 / Piece'
     },
     {
       id: 'petroleum-jelly',
@@ -161,7 +171,9 @@ export class KeyaDataService {
       categoryLabel: 'Cosmetics & Toiletries',
       imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3778.jpg',
       description: '100% triple-purified skin protectant jelly designed to heal dry skin, chapped lips, and minor scrapes.',
-      weightOrSize: '50ml / 100ml / 250ml'
+      weightOrSize: '50ml / 100ml / 250ml',
+      price: 180,
+      priceFormatted: '৳ 180 / 250ml Jar'
     },
     {
       id: 'keya-toothpaste',
@@ -170,7 +182,9 @@ export class KeyaDataService {
       categoryLabel: 'Cosmetics & Toiletries',
       imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3752.jpg',
       description: 'Fluoride-balanced herbal oral care toothpaste enriched with clove oil and natural mint for total gum defense.',
-      weightOrSize: '100g / 200g'
+      weightOrSize: '100g / 200g',
+      price: 85,
+      priceFormatted: '৳ 85 / 200g Tube'
     },
     {
       id: 'keya-detergent',
@@ -179,7 +193,9 @@ export class KeyaDataService {
       categoryLabel: 'Cosmetics & Toiletries',
       imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3411.jpg',
       description: 'Advanced stain-fighting detergent powder with lemon freshness that preserves garment color and fiber texture.',
-      weightOrSize: '500g / 1kg / 2kg'
+      weightOrSize: '500g / 1kg / 2kg',
+      price: 160,
+      priceFormatted: '৳ 160 / 1kg Pack'
     }
   ];
 
@@ -302,7 +318,9 @@ export class KeyaDataService {
         imageUrl: i.imageUrl,
         description: i.description,
         weightOrSize: i.weightOrSize,
-        badge: i.badge
+        badge: i.badge,
+        price: i.price,
+        priceFormatted: i.priceFormatted || (i.price ? `৳ ${i.price}` : undefined)
       }))),
       catchError(() => of(this.getProductsByCategory(category || 'all')))
     );

@@ -15,9 +15,9 @@ import { KeyaProduct } from '../../models/keya-data.model';
         
         <!-- Header -->
         <div class="mb-10 text-center">
-          <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-wide uppercase">OUR PRODUCTS</h1>
+          <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-wide uppercase">OUR PRODUCTS & PRICING</h1>
           <p class="text-gray-600 text-sm mt-2 max-w-xl mx-auto">
-            Discover Keya Group's wide range of premium cosmetics, personal care products, and global RMG textile knitwear.
+            Discover Keya Group's wide range of premium cosmetics, personal care products, and global RMG textile knitwear with wholesale pricing.
           </p>
           <div class="w-16 h-1 bg-[#0170B9] mx-auto rounded-full mt-4"></div>
         </div>
@@ -67,7 +67,7 @@ import { KeyaProduct } from '../../models/keya-data.model';
         <!-- Loading State -->
         <div *ngIf="isLoading" class="text-center py-16">
           <i class="fa-solid fa-circle-notch animate-spin text-3xl text-[#0170B9] mb-3"></i>
-          <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Loading products catalogue...</p>
+          <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Loading products catalogue & pricing...</p>
         </div>
 
         <!-- Products Grid -->
@@ -77,32 +77,50 @@ import { KeyaProduct } from '../../models/keya-data.model';
             class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col justify-between group"
           >
             <div>
-              <div class="relative bg-gray-100 aspect-square overflow-hidden">
+              <div class="relative bg-gray-100 aspect-square overflow-hidden cursor-pointer" (click)="openModal(item)">
                 <img 
                   [src]="item.imageUrl" 
                   [alt]="item.name" 
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
+                
+                <!-- Badge Top Left -->
                 <span 
                   *ngIf="item.badge" 
                   class="absolute top-3 left-3 bg-[#0170B9] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md uppercase tracking-wider"
                 >
                   {{ item.badge }}
                 </span>
+
+                <!-- Price Badge Bottom Right -->
+                <span 
+                  *ngIf="item.priceFormatted || item.price" 
+                  class="absolute bottom-3 right-3 bg-gray-900/90 text-amber-400 backdrop-blur-sm text-xs font-black px-3 py-1 rounded-lg shadow-lg border border-amber-400/30"
+                >
+                  {{ item.priceFormatted || ('৳ ' + item.price) }}
+                </span>
               </div>
 
               <div class="p-5">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400 block mb-1">
-                  {{ item.categoryLabel }}
-                </span>
-                <h3 class="font-bold text-base text-gray-900 group-hover:text-[#0170B9] transition-colors mb-2">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">
+                    {{ item.categoryLabel }}
+                  </span>
+                  <span *ngIf="item.priceFormatted" class="text-xs font-black text-emerald-600">
+                    {{ item.priceFormatted }}
+                  </span>
+                </div>
+
+                <h3 (click)="openModal(item)" class="font-bold text-base text-gray-900 group-hover:text-[#0170B9] transition-colors mb-2 cursor-pointer">
                   {{ item.name }}
                 </h3>
+
                 <p class="text-xs text-gray-600 leading-relaxed line-clamp-2">
                   {{ item.description }}
                 </p>
+
                 <div *ngIf="item.weightOrSize" class="mt-3 text-[11px] font-semibold text-gray-500">
-                  <i class="fa-solid fa-tag text-[#0170B9] mr-1"></i> {{ item.weightOrSize }}
+                  <i class="fa-solid fa-tag text-[#0170B9] mr-1"></i> Spec: {{ item.weightOrSize }}
                 </div>
               </div>
             </div>
@@ -113,14 +131,14 @@ import { KeyaProduct } from '../../models/keya-data.model';
                 (click)="openPurchaseQueryModal(item)"
                 class="w-full bg-[#0170B9] hover:bg-[#005894] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow"
               >
-                <i class="fa-solid fa-cart-flatbed"></i> Inquire Purchase / Get Quote
+                <i class="fa-solid fa-cart-flatbed"></i> Inquire Purchase / Send Quote
               </button>
 
               <button 
                 (click)="openModal(item)"
                 class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5"
               >
-                <i class="fa-solid fa-eye"></i> View Details
+                <i class="fa-solid fa-circle-info"></i> View Details & High-Res Image
               </button>
             </div>
           </div>
@@ -135,6 +153,69 @@ import { KeyaProduct } from '../../models/keya-data.model';
           </button>
         </div>
 
+      </div>
+
+      <!-- High-Res Product Details Lightbox Modal -->
+      <div *ngIf="activeModalProduct" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 max-h-[90vh] overflow-y-auto">
+          <button 
+            (click)="activeModalProduct = null" 
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 text-2xl z-10 bg-white/80 w-10 h-10 rounded-full flex items-center justify-center shadow"
+            aria-label="Close"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- High-Res Image Container -->
+            <div class="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 shadow-inner">
+              <img [src]="activeModalProduct.imageUrl" [alt]="activeModalProduct.name" class="w-full h-full object-cover" />
+              
+              <span *ngIf="activeModalProduct.badge" class="absolute top-3 left-3 bg-[#0170B9] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">
+                {{ activeModalProduct.badge }}
+              </span>
+
+              <span *ngIf="activeModalProduct.priceFormatted || activeModalProduct.price" class="absolute bottom-3 right-3 bg-gray-900 text-amber-400 text-xs font-black px-3.5 py-1.5 rounded-lg shadow-lg border border-amber-400/40">
+                {{ activeModalProduct.priceFormatted || ('৳ ' + activeModalProduct.price) }}
+              </span>
+            </div>
+
+            <!-- Details Information -->
+            <div class="flex flex-col justify-between">
+              <div>
+                <span class="inline-block bg-blue-50 text-[#0170B9] text-[11px] font-bold px-3 py-1 rounded-full uppercase mb-2">
+                  {{ activeModalProduct.categoryLabel }}
+                </span>
+
+                <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900 mb-2 leading-tight">
+                  {{ activeModalProduct.name }}
+                </h2>
+
+                <div *ngIf="activeModalProduct.priceFormatted" class="text-base font-black text-emerald-600 mb-3">
+                  <i class="fa-solid fa-tag mr-1"></i> {{ activeModalProduct.priceFormatted }}
+                </div>
+
+                <p class="text-xs text-gray-600 leading-relaxed mb-4">
+                  {{ activeModalProduct.description }}
+                </p>
+
+                <div *ngIf="activeModalProduct.weightOrSize" class="bg-gray-50 p-3 rounded-xl border border-gray-100 mb-4 text-xs font-medium text-gray-700">
+                  <span class="font-bold text-gray-900 block mb-0.5">Specification / Package Unit:</span>
+                  {{ activeModalProduct.weightOrSize }}
+                </div>
+              </div>
+
+              <div class="pt-4 border-t border-gray-100 space-y-2">
+                <button 
+                  (click)="openPurchaseQueryModal(activeModalProduct); activeModalProduct = null" 
+                  class="w-full bg-[#0170B9] hover:bg-[#005894] text-white text-xs font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 uppercase tracking-wider"
+                >
+                  <i class="fa-solid fa-cart-flatbed"></i> Inquire Purchase / Send Order Quote to Admin
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Product Purchase Quote Request Modal -->
@@ -155,13 +236,14 @@ import { KeyaProduct } from '../../models/keya-data.model';
             <div>
               <h3 class="text-base font-bold text-gray-900 leading-tight">Product Purchase Inquiry</h3>
               <span class="text-xs text-gray-500">Target Product: <strong class="text-[#0170B9]">{{ targetProduct?.name }}</strong></span>
+              <span *ngIf="targetProduct?.priceFormatted" class="block text-[11px] font-bold text-emerald-600">Price: {{ targetProduct?.priceFormatted }}</span>
             </div>
           </div>
 
           <!-- Success Alert -->
           <div *ngIf="inquirySubmitted" class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2 mb-4">
             <i class="fa-solid fa-circle-check text-lg"></i>
-            <span>Thank you! Your purchase inquiry has been submitted. Keya Group sales staff will contact you shortly.</span>
+            <span>Thank you! Your purchase inquiry for '{{ targetProduct?.name }}' has been submitted directly to Admin & Staff. We will contact you shortly.</span>
           </div>
 
           <form *ngIf="!inquirySubmitted" (ngSubmit)="submitPurchaseQuery()" class="space-y-4 text-xs">
@@ -195,44 +277,12 @@ import { KeyaProduct } from '../../models/keya-data.model';
               [disabled]="!customerName || !customerEmail || !customerPhone || !quantity || isSubmittingInquiry"
               class="w-full bg-[#0170B9] hover:bg-[#005894] disabled:bg-gray-300 text-white font-bold py-3 rounded-lg text-xs uppercase tracking-wider shadow transition-all flex items-center justify-center gap-2"
             >
-              <span *ngIf="!isSubmittingInquiry">Submit Purchase Query</span>
+              <span *ngIf="!isSubmittingInquiry">Submit Purchase Query to Admin</span>
               <span *ngIf="isSubmittingInquiry" class="flex items-center gap-2">
                 <i class="fa-solid fa-circle-notch animate-spin"></i> Submitting...
               </span>
             </button>
           </form>
-        </div>
-      </div>
-
-      <!-- Product Modal Lightbox -->
-      <div *ngIf="activeModalProduct" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative border border-gray-100">
-          <button 
-            (click)="activeModalProduct = null" 
-            class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-xl"
-            aria-label="Close"
-          >
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-
-          <div class="aspect-video rounded-xl overflow-hidden mb-4 bg-gray-100">
-            <img [src]="activeModalProduct.imageUrl" [alt]="activeModalProduct.name" class="w-full h-full object-cover" />
-          </div>
-
-          <span class="inline-block bg-blue-50 text-[#0170B9] text-[11px] font-bold px-3 py-1 rounded-full uppercase mb-2">
-            {{ activeModalProduct.categoryLabel }}
-          </span>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">{{ activeModalProduct.name }}</h3>
-          <p class="text-sm text-gray-600 leading-relaxed mb-4">{{ activeModalProduct.description }}</p>
-
-          <div class="pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
-            <span *ngIf="activeModalProduct.weightOrSize" class="text-xs font-semibold text-gray-500">
-              Spec: {{ activeModalProduct.weightOrSize }}
-            </span>
-            <button (click)="openPurchaseQueryModal(activeModalProduct); activeModalProduct = null" class="bg-[#0170B9] text-white text-xs font-bold px-5 py-2.5 rounded-lg hover:bg-[#005894] transition-all flex items-center gap-1.5">
-              <i class="fa-solid fa-cart-flatbed"></i> Inquire Purchase / Get Quote
-            </button>
-          </div>
         </div>
       </div>
 

@@ -7,6 +7,8 @@ export interface KeyaProduct {
   description: string;
   weightOrSize?: string;
   badge?: string;
+  price?: number;
+  priceFormatted?: string;
 }
 
 export interface ProductInquiry {

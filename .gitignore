@@ -1,0 +1,25 @@
+# Build outputs & binaries
+[Bb]in/
+[Oo]bj/
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# Database files
+*.db
+*.sqlite
+
+# IDE & Editor files
+.vs/
+.vscode/
+.idea/
+
+# Node & Frontend dependencies & build artifacts
+node_modules/
+dist/
+.angular/
+.tmp/
+
+# Log files
+*.log

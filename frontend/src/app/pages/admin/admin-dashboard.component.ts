@@ -192,8 +192,8 @@ import { Employee } from '../../models/user.model';
           <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
               <div>
-                <h2 class="text-lg font-bold text-gray-900">Product Catalogue CRUD</h2>
-                <p class="text-xs text-gray-500">Create, update, or remove Keya Group products live in SQL Server database.</p>
+                <h2 class="text-lg font-bold text-gray-900">Product Catalogue CRUD & Pricing</h2>
+                <p class="text-xs text-gray-500">Create, update, set prices, or remove Keya Group products live in SQL Server database.</p>
               </div>
               <button 
                 (click)="openAddProductModal()" 
@@ -211,6 +211,7 @@ import { Employee } from '../../models/user.model';
                     <th class="px-4 py-3">Image</th>
                     <th class="px-4 py-3">Product Name</th>
                     <th class="px-4 py-3">Category</th>
+                    <th class="px-4 py-3">Unit Price / Format</th>
                     <th class="px-4 py-3">Badge / Tag</th>
                     <th class="px-4 py-3">Specification</th>
                     <th class="px-4 py-3 text-right">Actions</th>
@@ -226,6 +227,9 @@ import { Employee } from '../../models/user.model';
                       <span [class]="p.category === 'cosmetics' ? 'bg-blue-50 text-[#0170B9]' : 'bg-emerald-50 text-emerald-700'" class="px-2.5 py-0.5 rounded font-bold uppercase text-[10px]">
                         {{ p.categoryLabel }}
                       </span>
+                    </td>
+                    <td class="px-4 py-3 font-bold text-emerald-700">
+                      {{ p.priceFormatted || (p.price ? ('৳ ' + p.price) : '-') }}
                     </td>
                     <td class="px-4 py-3">
                       <span *ngIf="p.badge" class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold text-[10px]">
@@ -425,7 +429,7 @@ import { Employee } from '../../models/user.model';
 
       <!-- Modal: Add/Edit Product -->
       <div *ngIf="showProductModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100 max-h-[90vh] overflow-y-auto">
           <button (click)="showProductModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-xl">
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -445,9 +449,25 @@ import { Employee } from '../../models/user.model';
               </select>
             </div>
 
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold uppercase text-gray-600 mb-1">Unit Price (Numeric)</label>
+                <input type="number" [(ngModel)]="activeProduct.price" name="pPrice" placeholder="e.g. 120" class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+              <div>
+                <label class="block font-bold uppercase text-gray-600 mb-1">Formatted Price Display</label>
+                <input type="text" [(ngModel)]="activeProduct.priceFormatted" name="pPriceFmt" placeholder="e.g. ৳ 120 / Pack" class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+            </div>
+
             <div>
               <label class="block font-bold uppercase text-gray-600 mb-1">Image URL</label>
               <input type="text" [(ngModel)]="activeProduct.imageUrl" name="pImg" required class="w-full px-3 py-2 border rounded-lg" />
+            </div>
+
+            <div>
+              <label class="block font-bold uppercase text-gray-600 mb-1">Specification / Weight</label>
+              <input type="text" [(ngModel)]="activeProduct.weightOrSize" name="pWeight" placeholder="e.g. 100g / 150g" class="w-full px-3 py-2 border rounded-lg" />
             </div>
 
             <div>
@@ -667,7 +687,7 @@ export class AdminDashboardComponent implements OnInit {
   // --- PRODUCT CRUD ---
   openAddProductModal() {
     this.isEditingProduct = false;
-    this.activeProduct = { id: 0, name: '', category: 'cosmetics', categoryLabel: 'Cosmetics & Toiletries', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/2-Keya-Super-Lemon-Soap-2.jpg', description: '', badge: 'New Arrival' };
+    this.activeProduct = { id: 0, name: '', category: 'cosmetics', categoryLabel: 'Cosmetics & Toiletries', imageUrl: 'https://keyagroupbd.com/wp-content/uploads/2020/12/2-Keya-Super-Lemon-Soap-2.jpg', description: '', badge: 'New Arrival', price: 100, priceFormatted: '৳ 100 / Pack' };
     this.showProductModal = true;
   }
 

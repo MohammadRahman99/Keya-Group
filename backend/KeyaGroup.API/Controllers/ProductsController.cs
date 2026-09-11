@@ -71,6 +71,8 @@ namespace KeyaGroup.API.Controllers
             existing.Description = product.Description;
             existing.WeightOrSize = product.WeightOrSize;
             existing.Badge = product.Badge;
+            existing.Price = product.Price;
+            existing.PriceFormatted = product.PriceFormatted;
 
             _unitOfWork.Products.Update(existing);
             await _unitOfWork.CompleteAsync();

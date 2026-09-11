@@ -85,7 +85,7 @@ namespace KeyaGroup.API.Data
                     {
                         FullName = "Operations Staff",
                         Email = "operator@keyagroup.com",
-                        PasswordHash = PasswordHasher.HashPassword("Operator123!"),
+                        PasswordHash = PasswordHasher.HashPassword("Operator"),
                         Role = "Operator",
                         Department = "Customer Inquiries & Operations",
                         PhoneNumber = "+8801833445566",
@@ -178,7 +178,9 @@ namespace KeyaGroup.API.Data
                         ImageUrl = "https://keyagroupbd.com/wp-content/uploads/2020/12/2-Keya-Super-Lemon-Soap-2.jpg",
                         Description = "Refreshing citrus beauty soap enriched with natural lemon extracts and moisturizing oils for vibrant, glowing skin.",
                         WeightOrSize = "100g / 150g",
-                        Badge = "Best Seller"
+                        Badge = "Best Seller",
+                        Price = 120.00m,
+                        PriceFormatted = "৳ 120 / Pack (4 Bars)"
                     },
                     new Product
                     {
@@ -187,7 +189,9 @@ namespace KeyaGroup.API.Data
                         CategoryLabel = "RMG & Textiles",
                         ImageUrl = "https://keyagroupbd.com/wp-content/uploads/2020/12/rmg.jpg",
                         Description = "High-quality 100% combed cotton polo shirts, hoodies, pullovers, and casual wear manufactured for top global retail brands.",
-                        Badge = "Global Export"
+                        Badge = "Global Export",
+                        Price = 650.00m,
+                        PriceFormatted = "৳ 650 / Piece"
                     },
                     new Product
                     {
@@ -196,7 +200,9 @@ namespace KeyaGroup.API.Data
                         CategoryLabel = "RMG & Textiles",
                         ImageUrl = "https://keyagroupbd.com/wp-content/uploads/2020/12/Mens-Polo-Shirt-1-1400x800-1.png",
                         Description = "Ergonomically tailored pique knit polo shirt featuring anti-pilling ring-spun cotton fabric with double-stitched hemline.",
-                        WeightOrSize = "Sizes S - 3XL"
+                        WeightOrSize = "Sizes S - 3XL",
+                        Price = 450.00m,
+                        PriceFormatted = "৳ 450 / Piece"
                     },
                     new Product
                     {
@@ -205,7 +211,9 @@ namespace KeyaGroup.API.Data
                         CategoryLabel = "RMG & Textiles",
                         ImageUrl = "https://keyagroupbd.com/wp-content/uploads/2020/12/Pullover-Sweat-Shirt-1400x800-1.png",
                         Description = "Ultra-warm heavy fleece sweatshirt with ribbed cuffs and neckband designed for international winter apparel lines.",
-                        WeightOrSize = "Sizes S - XXL"
+                        WeightOrSize = "Sizes S - XXL",
+                        Price = 850.00m,
+                        PriceFormatted = "৳ 850 / Piece"
                     },
                     new Product
                     {
@@ -214,7 +222,9 @@ namespace KeyaGroup.API.Data
                         CategoryLabel = "RMG & Textiles",
                         ImageUrl = "https://keyagroupbd.com/wp-content/uploads/2020/12/Womens-Polo-Shirt-1400x800-1.png",
                         Description = "Elegantly shaped 100% soft-touch cotton polo shirt engineered for maximum comfort and style durability.",
-                        WeightOrSize = "Sizes XS - XL"
+                        WeightOrSize = "Sizes XS - XL",
+                        Price = 420.00m,
+                        PriceFormatted = "৳ 420 / Piece"
                     },
                     new Product
                     {
@@ -223,7 +233,9 @@ namespace KeyaGroup.API.Data
                         CategoryLabel = "Cosmetics & Toiletries",
                         ImageUrl = "https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3778.jpg",
                         Description = "100% triple-purified skin protectant jelly designed to heal dry skin, chapped lips, and minor scrapes.",
-                        WeightOrSize = "50ml / 100ml / 250ml"
+                        WeightOrSize = "50ml / 100ml / 250ml",
+                        Price = 180.00m,
+                        PriceFormatted = "৳ 180 / 250ml Jar"
                     },
                     new Product
                     {
@@ -232,7 +244,9 @@ namespace KeyaGroup.API.Data
                         CategoryLabel = "Cosmetics & Toiletries",
                         ImageUrl = "https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3752.jpg",
                         Description = "Fluoride-balanced herbal oral care toothpaste enriched with clove oil and natural mint for total gum defense.",
-                        WeightOrSize = "100g / 200g"
+                        WeightOrSize = "100g / 200g",
+                        Price = 85.00m,
+                        PriceFormatted = "৳ 85 / 200g Tube"
                     },
                     new Product
                     {
@@ -241,7 +255,9 @@ namespace KeyaGroup.API.Data
                         CategoryLabel = "Cosmetics & Toiletries",
                         ImageUrl = "https://keyagroupbd.com/wp-content/uploads/2020/12/DSC3411.jpg",
                         Description = "Advanced stain-fighting detergent powder with lemon freshness that preserves garment color and fiber texture.",
-                        WeightOrSize = "500g / 1kg / 2kg"
+                        WeightOrSize = "500g / 1kg / 2kg",
+                        Price = 160.00m,
+                        PriceFormatted = "৳ 160 / 1kg Pack"
                     }
                 };
 
